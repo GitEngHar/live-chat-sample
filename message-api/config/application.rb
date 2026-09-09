@@ -40,5 +40,9 @@ module MessageApi
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # Needed so controllers can set cookies (used to identify the current
+    # user for the AnyCable connection) and have them written to the response.
+    config.middleware.use ActionDispatch::Cookies
   end
 end

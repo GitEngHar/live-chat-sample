@@ -6,17 +6,17 @@ Rails.application.routes.draw do
   #
   get "up" => "rails/health#show", as: :rails_health_check
 
-  namespace :user do # 簡単なユーザー管理基盤
-    post "create", to: "user#create" # ユーザー登録
-    get "get", to: "user#get" # ユーザー取得
-  end
+  # NOTE: User/Room モデルと同名になる namespace(User::UserController等)は
+  #       Zeitwerkのオートロードでモデルクラスと衝突するため、プレーンなパスで定義する。
+  post "user/create", to: "user#create" # ユーザー登録
+  get "user/get", to: "user#get" # ユーザー取得(ログイン確認)
 
-  namespace :room do
-    post "create", to: "room#create" # メッセージチャットの投稿
-    put "action", to: "room#action" # ユーザーのルーム参加状態管理
-  end
+  get "room/index", to: "room#index" # ルーム一覧取得
+  post "room/create", to: "room#create" # ルーム作成
+  put "room/action", to: "room#action" # ユーザーのルーム参加状態管理
 
   namespace :chat do
       post "streams/create", to: "streams#create" # メッセージチャットの投稿
+      get "streams/index", to: "streams#index" # ルームのメッセージ履歴取得
   end
 end
