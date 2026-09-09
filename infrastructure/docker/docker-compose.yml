@@ -1,0 +1,63 @@
+services:
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ../../frontend:/app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+      VITE_CABLE_URL: ws://localhost:8080/cable
+    depends_on:
+      - message-api
+
+  message-api:
+    build:
+      context: ../../message-api
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      FRONTEND_ORIGIN: http://localhost:5173
+    volumes:
+      - message_api_storage:/rails/storage
+
+  # AnyCable RPC server: resolves Action Cable connections/channels for anycable-go over gRPC.
+  # Runs from the message-api codebase (anycable-rails), reusing the same image/Dockerfile
+  # with a different start command.
+  rpc-server:
+    build:
+      context: ../../message-api
+      dockerfile: Dockerfile
+    command: ["bundle", "exec", "anycable"]
+    ports:
+      - "50051:50051"
+    environment:
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    depends_on:
+      - redis
+
+  anycable-go:
+    image: anycable/anycable-go:1.5
+    ports:
+      - "8080:8080"
+    environment:
+      ANYCABLE_HOST: "0.0.0.0"
+      ANYCABLE_PORT: "8080"
+      ANYCABLE_RPC_HOST: rpc-server:50051
+      ANYCABLE_REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - rpc-server
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  message_api_storage:

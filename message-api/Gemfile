@@ -14,7 +14,14 @@ gem "puma", ">= 5.0"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "anycable-rails"
 
+# json 3.0 (released 2026-09-07) made JSON.parse's second argument keyword-only,
+# which breaks ActiveSupport::JSON.decode(json, options)'s positional-hash call
+# (used by anycable-rails on every RPC disconnect) with
+# "wrong number of arguments (given 2, expected 1)". Pin to 2.x until Rails/anycable-rails
+# catch up.
+gem "json", "~> 2.9"
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
@@ -31,7 +38,7 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
-# gem "rack-cors"
+gem "rack-cors"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
