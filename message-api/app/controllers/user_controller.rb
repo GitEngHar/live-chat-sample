@@ -28,8 +28,11 @@ class UserController < ApplicationController
 
   # AnyCable の Connection#find_verified_user から参照するため、
   # ユーザーIDを暗号化Cookieに保存する。
+  # frontend (apex), message-api (api.*), anycable-go (cable.*) がサブドメイン違いで
+  # 動いているため、domain: :all で全サブドメイン共有Cookieにする
+  # (指定しないとホスト固有Cookieになり、cable.* への WebSocket 接続時に送られない)。
   def sign_in(user)
-    cookies.encrypted[:user_id] = { value: user.id, httponly: true, same_site: :lax }
+    cookies.encrypted[:user_id] = { value: user.id, httponly: true, same_site: :lax, domain: :all }
   end
 
   def serialize(user)

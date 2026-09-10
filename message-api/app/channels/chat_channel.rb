@@ -5,9 +5,18 @@ class ChatChannel < ApplicationCable::Channel
   # このチャンネルは配信の受信専用(subscribeのみ)。
   def subscribed
     room = Room.find_by(id: params[:room_id])
-    reject unless room
-
+    unless room.present?
+      reject
+      return
+    end
     stream_for room
+    join_presence(
+      id: current_user.id,
+      info: {
+        name: current_user.name,
+        room_id: room.id
+      },
+    )
   end
 
   def unsubscribed

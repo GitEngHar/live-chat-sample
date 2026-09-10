@@ -19,3 +19,8 @@ export type Message = {
   content: string;
   created_at: string;
 };
+
+export type PresenceInfo = {
+  name: string;
+  room_id: number;
+};
