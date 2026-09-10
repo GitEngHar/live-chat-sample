@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { connectCable, subscribeToChannel, unsubscribeFromChannel } from "./cable";
+import { subscribeToRoom, unsubscribeFromChannel } from "./cable";
 import { fetchMessages, sendMessage, ApiError } from "./api";
-import type { Message, Room, User } from "./types";
+import type { Message, PresenceInfo, Room, User } from "./types";
 
 type Props = {
   room: Room;
@@ -15,6 +15,7 @@ export function ChatScreen({ room, user, loading, error, onLeave }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
   const [sendError, setSendError] = useState<string | null>(null);
+  const [presentUsers, setPresentUsers] = useState<Record<string, PresenceInfo>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -27,14 +28,21 @@ export function ChatScreen({ room, user, loading, error, onLeave }: Props) {
         if (!cancelled) setSendError("メッセージ履歴の取得に失敗しました");
       });
 
-    connectCable();
-    const subscription = subscribeToChannel<Message>("ChatChannel", { room_id: room.id }, (message) => {
+    const channel = subscribeToRoom(room.id, (message) => {
       setMessages((prev) => (prev.some((m) => m.id === message.id) ? prev : [...prev, message]));
     });
 
+    const refreshPresence = () => {
+      channel.presence.info().then((state) => {
+        if (!cancelled && state) setPresentUsers(state as Record<string, PresenceInfo>);
+      });
+    };
+    channel.on("presence", refreshPresence);
+    refreshPresence();
+
     return () => {
       cancelled = true;
-      unsubscribeFromChannel(subscription);
+      unsubscribeFromChannel(channel);
     };
   }, [room.id]);
 
@@ -64,6 +72,10 @@ export function ChatScreen({ room, user, loading, error, onLeave }: Props) {
 
       {error && <p className="error">{error}</p>}
       {sendError && <p className="error">{sendError}</p>}
+
+      <p className="presence-list">
+        参加中 ({Object.keys(presentUsers).length}人): {Object.values(presentUsers).map((u) => u.name).join(", ") || "なし"}
+      </p>
 
       <ul className="message-list">
         {messages.map((message) => (
