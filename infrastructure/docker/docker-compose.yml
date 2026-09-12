@@ -74,6 +74,8 @@ services:
       ANYCABLE_PRESETS: "broker"
       ANYCABLE_PRESENCE: "true"
       ANYCABLE_PRESENCE_TTL: "15"
+      ANYCABLE_SHUTDOWN_SLOWDRAIN: "true"
+      ANYCABLE_SHUTDOWN_GRACE_PERIOD: "30"
     depends_on:
       - rpc-server
 

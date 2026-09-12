@@ -16,6 +16,8 @@ export function ChatScreen({ room, user, loading, error, onLeave }: Props) {
   const [draft, setDraft] = useState("");
   const [sendError, setSendError] = useState<string | null>(null);
   const [presentUsers, setPresentUsers] = useState<Record<string, PresenceInfo>>({});
+  // 個人向けstream経由の警告(残高警告・NGワードでbroadcastされなかった場合の通知など)。
+  const [warning, setWarning] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -28,8 +30,12 @@ export function ChatScreen({ room, user, loading, error, onLeave }: Props) {
         if (!cancelled) setSendError("メッセージ履歴の取得に失敗しました");
       });
 
-    const channel = subscribeToRoom(room.id, (message) => {
-      setMessages((prev) => (prev.some((m) => m.id === message.id) ? prev : [...prev, message]));
+    const channel = subscribeToRoom(room.id, (payload) => {
+      if (payload.type === "balance_warning" || payload.type === "broadcast_warning") {
+        setWarning(payload.content);
+        return;
+      }
+      setMessages((prev) => (prev.some((m) => m.id === payload.id) ? prev : [...prev, payload]));
     });
 
     const refreshPresence = () => {
@@ -72,6 +78,14 @@ export function ChatScreen({ room, user, loading, error, onLeave }: Props) {
 
       {error && <p className="error">{error}</p>}
       {sendError && <p className="error">{sendError}</p>}
+      {warning && (
+        <p className="balance-warning">
+          {warning}
+          <button type="button" onClick={() => setWarning(null)}>
+            閉じる
+          </button>
+        </p>
+      )}
 
       <p className="presence-list">
         参加中 ({Object.keys(presentUsers).length}人): {Object.values(presentUsers).map((u) => u.name).join(", ") || "なし"}

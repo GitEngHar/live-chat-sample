@@ -241,6 +241,13 @@ resource "aws_ecs_task_definition" "anycable_go" {
         { name = "ANYCABLE_PRESETS", value = "broker" },
         { name = "ANYCABLE_PRESENCE", value = "true" },
         { name = "ANYCABLE_PRESENCE_TTL", value = "15" },
+        { name = "ANYCABLE_SHUTDOWN_SLOWDRAIN", value = "true" },
+        { name = "ANYCABLE_SHUTDOWN_GRACE_PERIOD", value = "30" },
+        # 3台構成で接続が均等に分散されているか確認するための定期統計ログ出力。
+        # タスク(ノード)ごとにCloudWatch Logsのストリームが分かれるので、
+        # ノードごとのclients_numを比較すればよい。
+        { name = "ANYCABLE_METRICS_LOG", value = "true" },
+        { name = "ANYCABLE_METRICS_ROTATE_INTERVAL", value = "60" },
       ]
       secrets = [
         { name = "ANYCABLE_REDIS_URL", valueFrom = aws_secretsmanager_secret.valkey_url.arn },
@@ -262,7 +269,7 @@ resource "aws_ecs_service" "anycable_go" {
   name            = "anycable-go-pro"
   cluster         = aws_ecs_cluster.live_chat.id
   task_definition = aws_ecs_task_definition.anycable_go.arn
-  desired_count   = 1
+  desired_count   = 3
   launch_type     = "FARGATE"
 
   network_configuration {
