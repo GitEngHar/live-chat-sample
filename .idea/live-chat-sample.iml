@@ -80,6 +80,7 @@
     <orderEntry type="library" scope="PROVIDED" name="ostruct (v0.6.3, rbenv: 3.4.5) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="parallel (v2.2.0, rbenv: 3.4.5) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="parser (v3.3.12.0, rbenv: 3.4.5) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="pg (v1.6.3, rbenv: 3.4.5) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="pp (v0.6.4, rbenv: 3.4.5) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="prettyprint (v0.2.0, rbenv: 3.4.5) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="prism (v1.9.0, rbenv: 3.4.5) [gem]" level="application" />

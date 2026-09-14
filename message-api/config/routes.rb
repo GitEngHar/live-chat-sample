@@ -19,4 +19,6 @@ Rails.application.routes.draw do
       post "streams/create", to: "streams#create" # メッセージチャットの投稿
       get "streams/index", to: "streams#index" # ルームのメッセージ履歴取得
   end
+
+  post "notifications/broadcast", to: "notifications#create" # 特定ユーザーへの一斉通知(残高警告など)
 end

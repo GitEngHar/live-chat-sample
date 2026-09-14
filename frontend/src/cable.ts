@@ -1,11 +1,11 @@
 import { createCable, Channel } from "@anycable/web";
-import type { Message } from "./types";
+import type { ChannelPayload } from "./types";
 
 const CABLE_URL = import.meta.env.VITE_CABLE_URL ?? "ws://localhost:8080/cable";
 
 type ChatChannelParams = { room_id: number };
 
-export class ChatChannel extends Channel<ChatChannelParams, Message> {
+export class ChatChannel extends Channel<ChatChannelParams, ChannelPayload> {
   static readonly identifier = "ChatChannel";
 }
 
@@ -25,9 +25,9 @@ function getCable() {
   return cable;
 }
 
-export function subscribeToRoom(roomId: number, onMessage: (message: Message) => void): ChatChannel {
+export function subscribeToRoom(roomId: number, onPayload: (payload: ChannelPayload) => void): ChatChannel {
   const channel = getCable().subscribeTo(ChatChannel, { room_id: roomId });
-  channel.on("message", onMessage);
+  channel.on("message", onPayload);
   return channel;
 }
 

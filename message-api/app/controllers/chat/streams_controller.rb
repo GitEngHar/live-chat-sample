@@ -16,6 +16,11 @@ module Chat
       user = User.find_by(id: params[:user_id])
       return render json: { errors: ["room_id または user_id が不正です"] }, status: :unprocessable_entity unless room && user
 
+      if MessageFilter.blocked?(params[:content])
+        ChatChannel.broadcast_to(user, { type: "broadcast_warning", content: "メッセージにNGワードが含まれているため送信できませんでした" })
+        return render json: { errors: ["メッセージにNGワードが含まれています"] }, status: :unprocessable_entity
+      end
+
       message = room.messages.new(user: user, content: params[:content])
 
       if message.save
@@ -30,6 +35,7 @@ module Chat
 
     def serialize(message)
       {
+        type: "message",
         id: message.id,
         room_id: message.room_id,
         user_id: message.user_id,

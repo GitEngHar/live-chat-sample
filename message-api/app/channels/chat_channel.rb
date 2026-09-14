@@ -10,6 +10,11 @@ class ChatChannel < ApplicationCable::Channel
       return
     end
     stream_for room
+
+    # ユーザー個人宛の通知(残高警告など)用。ルームの入退室に関係なく、接続している間は
+    # 常に届く。NotificationsController#create から User 宛に broadcast_to される。
+    stream_for current_user
+
     join_presence(
       id: current_user.id,
       info: {

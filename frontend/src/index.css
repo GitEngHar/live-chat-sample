@@ -35,6 +35,18 @@ button {
   color: #c0392b;
 }
 
+.balance-warning {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #fff3cd;
+  color: #8a6d3b;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+}
+
 .auth-screen h1 {
   text-align: center;
 }
