@@ -14,7 +14,7 @@ frontend変更時:
 cd frontend
 docker build --platform linux/amd64 \
     --build-arg VITE_API_BASE_URL=https://api.gitenghar-live-chat.com \
-    --build-arg VITE_CABLE_URL=wss://cable.gitenghar-live-chat.com/cable \
+    --build-arg VITE_CABLE_URL=wss://cable.gitenghar-live-chat.com:30001/cable \
     -t 363471485358.dkr.ecr.ap-northeast-1.amazonaws.com/live-chat/frontend:latest .
 docker push 363471485358.dkr.ecr.ap-northeast-1.amazonaws.com/live-chat/frontend:latest
 aws ecs update-service --profile cinema-ai --region ap-northeast-1 --cluster live-chat-cluster --service frontend --force-new-deployment

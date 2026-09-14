@@ -60,8 +60,8 @@ resource "aws_security_group" "nlb" {
 
   ingress {
     description = "WSS"
-    from_port   = 443
-    to_port     = 443
+    from_port   = 30001
+    to_port     = 30001
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -252,7 +252,7 @@ resource "aws_lb" "live_chat_net_lb" {
 
 resource "aws_lb_listener" "tls" {
   load_balancer_arn = aws_lb.live_chat_net_lb.arn
-  port              = 443
+  port              = 30001
   protocol          = "TLS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate_validation.site.certificate_arn
